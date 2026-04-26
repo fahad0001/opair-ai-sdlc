@@ -14,6 +14,15 @@
     "templates",
     "README.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opair-ai/opair-ai-sdlc.git",
+    "directory": "cli/ai-sdlc"
+  },
+  "homepage": "https://github.com/opair-ai/opair-ai-sdlc#readme",
+  "bugs": {
+    "url": "https://github.com/opair-ai/opair-ai-sdlc/issues"
+  },
   "engines": {
     "node": ">=20"
   },
