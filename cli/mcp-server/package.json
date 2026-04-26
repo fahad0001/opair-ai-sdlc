@@ -9,12 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/opair-ai/opair-ai-sdlc.git",
+    "url": "https://github.com/fahad0001/opair-ai-sdlc.git",
     "directory": "cli/mcp-server"
   },
-  "homepage": "https://github.com/opair-ai/opair-ai-sdlc#readme",
+  "homepage": "https://github.com/fahad0001/opair-ai-sdlc#readme",
   "bugs": {
-    "url": "https://github.com/opair-ai/opair-ai-sdlc/issues"
+    "url": "https://github.com/fahad0001/opair-ai-sdlc/issues"
   },
   "scripts": {
     "build": "tsup src/server.ts --format esm --dts --clean",
