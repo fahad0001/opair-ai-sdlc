@@ -6,7 +6,7 @@ consumer-facing `docs/agent-memory/` template that this repository ships.
 ## Why a separate namespace?
 
 The repository at its root IS the framework template. When a downstream user runs
-`agent-mem create` or `agent-mem adopt`, they get the consumer template (a clean
+`ai-sdlc create` or `ai-sdlc adopt`, they get the consumer template (a clean
 `docs/agent-memory/` with **no requirements yet**, ready for their R-0001).
 
 If we tracked our own upgrade work as `R-0001`, `R-0002`, ... inside
@@ -16,7 +16,7 @@ entries. That would be wrong.
 So framework-development uses an isolated, mirrored memory layout under `framework-dev/`
 with **`F-XXXX` IDs** (instead of `R-XXXX`). This namespace is:
 
-- **Excluded** from `agent-mem create` and `agent-mem adopt` scaffolding.
+- **Excluded** from `ai-sdlc create` and `ai-sdlc adopt` scaffolding.
 - **Included** in distribution as documentation / dogfood evidence only.
 - **Validated** by a sibling guard (forthcoming) that mirrors the rules of the consumer
   guard but operates on `F-XXXX` IDs.

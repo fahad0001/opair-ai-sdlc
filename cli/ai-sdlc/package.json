@@ -1,0 +1,46 @@
+{
+  "name": "@opair/ai-sdlc",
+  "version": "0.1.0-alpha.0",
+  "description": "Universal AI-assisted project bootstrapper and SDLC framework — anti-hallucination by construction.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "ai-sdlc": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "templates",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "sync:framework": "node scripts/sync-framework.mjs",
+    "prebuild": "npm run sync:framework",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "smoke": "node dist/cli.js --version"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "commander": "^12.1.0",
+    "execa": "^9.4.0",
+    "fast-glob": "^3.3.2",
+    "js-yaml": "^4.1.0",
+    "kleur": "^4.1.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.14.10",
+    "tsup": "^8.3.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
+}

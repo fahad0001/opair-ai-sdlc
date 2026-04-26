@@ -1,11 +1,11 @@
 {
-  "name": "@agent-mem/mcp-server",
+  "name": "@opair/mcp-server",
   "version": "0.1.0-alpha.0",
   "private": true,
   "type": "module",
   "main": "./dist/server.js",
   "bin": {
-    "agent-mem-mcp": "./dist/server.js"
+    "ai-sdlc-mcp": "./dist/server.js"
   },
   "scripts": {
     "build": "tsup src/server.ts --format esm --dts --clean",

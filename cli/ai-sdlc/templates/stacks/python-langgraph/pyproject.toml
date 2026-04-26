@@ -1,0 +1,23 @@
+[project]
+name = "__projectName__"
+version = "0.1.0"
+description = "AI agent project scaffolded by ai-sdlc"
+requires-python = ">=3.12"
+dependencies = [
+  "langgraph>=0.2.0",
+  "langchain-core>=0.3.0",
+  "pydantic>=2.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.0",
+  "ruff>=0.6.0",
+  "mypy>=1.11.0",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.mypy]
+strict = true

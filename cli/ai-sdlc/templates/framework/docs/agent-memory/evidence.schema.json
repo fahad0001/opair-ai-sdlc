@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-mem.dev/schemas/evidence.schema.json",
+  "title": "Evidence",
+  "description": "Closed-set evidence record attached to every factual claim made by an agent. See docs/agent-memory/00-anti-hallucination-charter.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "ref"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": ["file", "command", "test", "web", "human", "prior-artifact"]
+    },
+    "ref": {
+      "type": "string",
+      "description": "Path, command string, test id, URL, prompt id, or memory-artifact path. Required."
+    },
+    "lineRange": {
+      "type": "array",
+      "description": "[startLine, endLine] inclusive, 1-based. Required when kind=file or kind=prior-artifact and the cited content is a substring.",
+      "items": { "type": "integer", "minimum": 1 },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "sha256": {
+      "type": "string",
+      "description": "Hex-encoded SHA-256 of the cited content (file or stdout). Required when kind in {file, command, web, prior-artifact}.",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "exitCode": {
+      "type": "integer",
+      "description": "Process exit code. Required when kind=command."
+    },
+    "cwd": {
+      "type": "string",
+      "description": "Working directory when kind=command."
+    },
+    "framework": {
+      "type": "string",
+      "description": "Test framework identifier when kind=test (vitest|jest|pytest|playwright|...)."
+    },
+    "runId": {
+      "type": "string",
+      "description": "Test/CI run id when kind=test."
+    },
+    "result": {
+      "type": "string",
+      "enum": ["pass", "fail", "skip", "error"],
+      "description": "Test result when kind=test."
+    },
+    "retrievedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO timestamp when kind=web."
+    },
+    "promptId": {
+      "type": "string",
+      "description": "Wizard prompt id or vscode_askQuestions header when kind=human."
+    },
+    "answer": {
+      "type": "string",
+      "description": "Verbatim user answer when kind=human."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "kind": { "const": "file" } },
+        "required": ["kind"]
+      },
+      "then": { "required": ["ref", "sha256"] }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "command" } },
+        "required": ["kind"]
+      },
+      "then": { "required": ["ref", "sha256", "exitCode"] }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "test" } },
+        "required": ["kind"]
+      },
+      "then": { "required": ["ref", "framework", "result"] }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "web" } },
+        "required": ["kind"]
+      },
+      "then": { "required": ["ref", "sha256", "retrievedAt"] }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "human" } },
+        "required": ["kind"]
+      },
+      "then": { "required": ["ref", "promptId", "answer"] }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "prior-artifact" } },
+        "required": ["kind"]
+      },
+      "then": { "required": ["ref", "sha256"] }
+    }
+  ]
+}

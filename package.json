@@ -1,8 +1,8 @@
 {
-  "name": "agent-mem-framework",
+  "name": "ai-sdlc-framework",
   "version": "0.1.0-alpha.0",
   "private": true,
-  "description": "Multi-agent SDLC framework + agent-mem CLI (npm workspace root).",
+  "description": "Multi-agent SDLC framework + ai-sdlc CLI (npm workspace root).",
   "type": "module",
   "workspaces": [
     "cli/*"
@@ -16,9 +16,9 @@
     "guard": "node .github/scripts/agent-memory-guard.mjs",
     "ci:drift": "node .github/scripts/agent-memory-ci-drift.mjs",
     "check": "npm run validate:schema && npm run lint:ahc && npm run verify:hashes && npm run ci:drift && npm run guard",
-    "cli:build": "npm run build -w agent-mem",
-    "cli:test": "npm run test -w agent-mem",
-    "cli:dev": "npm run dev -w agent-mem"
+    "cli:build": "npm run build -w @opair/ai-sdlc",
+    "cli:test": "npm run test -w @opair/ai-sdlc",
+    "cli:dev": "npm run dev -w @opair/ai-sdlc"
   },
   "devDependencies": {
     "ajv": "^8.17.1",

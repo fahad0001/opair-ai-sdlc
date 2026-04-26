@@ -4,12 +4,12 @@ export default defineConfig({
   test: {
     include: [
       "cli/**/test/**/*.test.ts",
-      "cli/agent-mem/templates/stacks/**/test/**/*.test.ts",
+      "cli/ai-sdlc/templates/stacks/**/test/**/*.test.ts",
     ],
     exclude: [
       "**/node_modules/**",
       "**/dist/**",
-      "cli/agent-mem/templates/stacks/playwright-ts/**",
+      "cli/ai-sdlc/templates/stacks/playwright-ts/**",
     ],
   },
 });

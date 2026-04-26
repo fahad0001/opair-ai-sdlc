@@ -27,4 +27,4 @@ jobs:
       - run: npm run cli:build
       - run: npm run cli:test
       - name: pack (dry-run)
-        run: npm pack -w agent-mem --dry-run
+        run: npm pack -w @opair/ai-sdlc --dry-run

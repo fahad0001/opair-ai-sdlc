@@ -1,0 +1,125 @@
+name: Agent Memory Release Notes
+
+# Generates release notes and a sha256-pinned context-pack when a
+# semver tag is pushed. Both are uploaded as release artifacts so
+# downstream consumers (and AI agents) can pin to a verifiable
+# snapshot of the project's memory at release time.
+#
+# Required: a previous tag must exist that is reachable from the
+# pushed tag. The "since" tag is auto-detected via `git describe`.
+# If no previous tag exists, the range falls back to the repo's
+# initial commit.
+#
+# Inputs (workflow_dispatch only):
+#   since:  override the start tag/ISO date
+#   until:  override the end tag/ISO date (default: HEAD)
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "Start ref (tag or ISO datetime)"
+        required: false
+      until:
+        description: "End ref (tag or ISO datetime, default HEAD)"
+        required: false
+
+jobs:
+  release-notes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build ai-sdlc CLI
+        run: npm run build -w @opair/ai-sdlc
+
+      - name: Resolve range
+        id: range
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            UNTIL="${GITHUB_REF##refs/tags/}"
+          else
+            UNTIL="${{ github.event.inputs.until }}"
+            UNTIL="${UNTIL:-HEAD}"
+          fi
+          if [[ -n "${{ github.event.inputs.since }}" ]]; then
+            SINCE="${{ github.event.inputs.since }}"
+          else
+            # Find the previous tag reachable from UNTIL, excluding UNTIL itself.
+            SINCE="$(git describe --tags --abbrev=0 "${UNTIL}^" 2>/dev/null || true)"
+            if [[ -z "$SINCE" ]]; then
+              SINCE="$(git rev-list --max-parents=0 HEAD | tail -n1)"
+            fi
+          fi
+          echo "since=$SINCE" >> "$GITHUB_OUTPUT"
+          echo "until=$UNTIL" >> "$GITHUB_OUTPUT"
+          VERSION="${UNTIL}"
+          if [[ "$VERSION" == "HEAD" ]]; then
+            VERSION="$(date -u +%Y%m%d-%H%M%S)"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved: ${SINCE} -> ${UNTIL} (${VERSION})"
+
+      - name: Render release notes (Markdown)
+        run: |
+          npx --no-install ai-sdlc release-notes \
+            --since "${{ steps.range.outputs.since }}" \
+            --until "${{ steps.range.outputs.until }}" \
+            --version "${{ steps.range.outputs.version }}" \
+            --out "RELEASE_NOTES_${{ steps.range.outputs.version }}.md"
+
+      - name: Render release notes (JSON)
+        run: |
+          npx --no-install ai-sdlc release-notes \
+            --since "${{ steps.range.outputs.since }}" \
+            --until "${{ steps.range.outputs.until }}" \
+            --version "${{ steps.range.outputs.version }}" \
+            --format json \
+            --out "RELEASE_NOTES_${{ steps.range.outputs.version }}.json"
+
+      - name: Build context-pack (sha256-pinned)
+        run: |
+          npx --no-install ai-sdlc context-pack \
+            --out "context-pack_${{ steps.range.outputs.version }}.jsonl" \
+            --exclude-bodies
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-memory-release-${{ steps.range.outputs.version }}
+          path: |
+            RELEASE_NOTES_*.md
+            RELEASE_NOTES_*.json
+            context-pack_*.jsonl
+          if-no-files-found: error
+
+      - name: Attach to GitHub Release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.range.outputs.until }}
+          files: |
+            RELEASE_NOTES_*.md
+            RELEASE_NOTES_*.json
+            context-pack_*.jsonl
+          fail_on_unmatched_files: false

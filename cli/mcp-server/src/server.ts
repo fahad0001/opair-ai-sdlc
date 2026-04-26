@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * agent-mem MCP server (skeleton).
+ * ai-sdlc MCP server (skeleton).
  *
  * Exposes tools over stdio so any MCP-compatible client
  * (Claude Desktop, Continue, etc.) can query the agent-memory of a
@@ -17,7 +17,7 @@
  * Pass `--writable` to additionally expose mutating tools:
  *   - `am.create_requirement`, `am.update_status`, `am.append_event`, `am.ki_add`
  *
- * Run: `agent-mem-mcp [--cwd <repo>] [--writable]`
+ * Run: `ai-sdlc-mcp [--cwd <repo>] [--writable]`
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -440,7 +440,7 @@ const callTool = (
     }
     case "am.list_quality_gates": {
       const cfg = readJson<{ project?: { kind?: string } }>(
-        path.join(repoRoot, "agent-mem.config.json"),
+        path.join(repoRoot, "ai-sdlc.config.json"),
       );
       const kind = cfg.project?.kind ?? "library";
       const file = path.join(memDir, "07-quality-gates", `${kind}.md`);
@@ -1232,7 +1232,7 @@ const handle = (req: JsonRpcRequest): JsonRpcResponse => {
         id: req.id ?? null,
         result: {
           protocolVersion: "2024-11-05",
-          serverInfo: { name: "agent-mem", version: "0.1.0-alpha.0" },
+          serverInfo: { name: "ai-sdlc", version: "0.1.0-alpha.0" },
         },
       };
     }
