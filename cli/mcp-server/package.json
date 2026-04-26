@@ -13,8 +13,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
-    "agent-mem": "workspace:*"
+    "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
