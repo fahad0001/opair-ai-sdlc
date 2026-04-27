@@ -2,6 +2,7 @@
 import path from "node:path";
 import { Command } from "commander";
 import { cmdInit } from "./commands/init.js";
+import { cmdAdd } from "./commands/add.js";
 import { cmdStatus } from "./commands/status.js";
 import { cmdValidate } from "./commands/validate.js";
 import { cmdRepair } from "./commands/repair.js";
@@ -70,15 +71,32 @@ program
   )
   .option("--out <path>", "output path (default ./project-brief.md)")
   .option("--resume <path>", "resume from existing brief.json")
-  .action(async (o: { out?: string; resume?: string }) => {
-    await guard(() =>
-      cmdBrainstorm({
-        cwd: cwd(),
-        ...(o.out ? { out: o.out } : {}),
-        ...(o.resume ? { resume: o.resume } : {}),
-      }),
-    );
-  });
+  .option(
+    "--force",
+    "override duplication guard (run inside an existing framework)",
+  )
+  .option(
+    "--ai",
+    "emit brainstorm.prompt.md for an AI assistant instead of running the interactive wizard",
+  )
+  .action(
+    async (o: {
+      out?: string;
+      resume?: string;
+      force?: boolean;
+      ai?: boolean;
+    }) => {
+      await guard(() =>
+        cmdBrainstorm({
+          cwd: cwd(),
+          ...(o.out ? { out: o.out } : {}),
+          ...(o.resume ? { resume: o.resume } : {}),
+          ...(o.force ? { force: true } : {}),
+          ...(o.ai ? { ai: true } : {}),
+        }),
+      );
+    },
+  );
 
 program
   .command("create")
@@ -94,6 +112,14 @@ program
     "--from-brief <path>",
     "use a project-brief.json from `ai-sdlc brainstorm`",
   )
+  .option(
+    "--force",
+    "override duplication guard (existing framework in target or ancestor)",
+  )
+  .option(
+    "--capabilities <csv>",
+    "capability categories or ids (csv). default: diagnostics. use 'all' for everything.",
+  )
   .action(
     async (
       name: string | undefined,
@@ -103,6 +129,8 @@ program
         stack?: string;
         vendors?: string;
         fromBrief?: string;
+        force?: boolean;
+        capabilities?: string;
       },
     ) => {
       await guard(() =>
@@ -111,11 +139,20 @@ program
           ...(name ? { name } : {}),
           yes: o.yes,
           ...(o.fromBrief ? { fromBrief: rp(o.fromBrief) } : {}),
+          ...(o.force ? { force: true } : {}),
           preset: {
             ...(o.kind ? { projectKind: o.kind as never } : {}),
             ...(o.stack ? { stackId: o.stack } : {}),
             ...(o.vendors
               ? { vendors: o.vendors.split(",").map((s) => s.trim()) as never }
+              : {}),
+            ...(o.capabilities
+              ? {
+                  capabilities: o.capabilities
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean),
+                }
               : {}),
           },
         }),
@@ -182,11 +219,68 @@ program
   .description("Drop the agent-memory framework into the current directory.")
   .option("--force", "overwrite existing framework files")
   .option("--name <projectName>", "project name (default: directory name)")
-  .action(async (o: { force?: boolean; name?: string }) => {
-    await guard(() =>
-      cmdInit({ cwd: cwd(), force: o.force, projectName: o.name }),
-    );
-  });
+  .option(
+    "--capabilities <csv>",
+    "capability categories or ids (csv). default: diagnostics. use 'all' for everything.",
+  )
+  .action(
+    async (o: { force?: boolean; name?: string; capabilities?: string }) => {
+      await guard(() =>
+        cmdInit({
+          cwd: cwd(),
+          ...(o.force ? { force: true } : {}),
+          ...(o.name ? { projectName: o.name } : {}),
+          ...(o.capabilities
+            ? {
+                capabilities: o.capabilities
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter(Boolean),
+              }
+            : {}),
+        }),
+      );
+    },
+  );
+
+program
+  .command("add")
+  .description(
+    "Add capability agents/prompts to an existing framework root (categories or ids).",
+  )
+  .argument(
+    "[selectors...]",
+    "category ids, capability ids, or 'all'. Run with no args for a list.",
+  )
+  .option("--force", "overwrite existing capability files")
+  .option(
+    "--vendors <csv>",
+    "override vendor list (default: from ai-sdlc.config.json)",
+  )
+  .option("--dry-run", "print what would be added without writing")
+  .action(
+    async (
+      selectors: string[] | undefined,
+      o: { force?: boolean; vendors?: string; dryRun?: boolean },
+    ) => {
+      await guard(() =>
+        cmdAdd({
+          cwd: cwd(),
+          selectors: selectors ?? [],
+          ...(o.force ? { force: true } : {}),
+          ...(o.vendors
+            ? {
+                vendors: o.vendors
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter(Boolean) as never,
+              }
+            : {}),
+          ...(o.dryRun ? { dryRun: true } : {}),
+        }),
+      );
+    },
+  );
 
 program
   .command("status")

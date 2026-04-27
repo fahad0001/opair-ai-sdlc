@@ -1,0 +1,23 @@
+---
+name: doctor
+description: "Diagnose memory layout, AHC overlays, CI scaffolding, and vendor surfaces."
+argument-hint: "[--json]"
+---
+You are running the `ai-sdlc doctor` capability.
+
+Inputs:
+${input}
+
+Rules:
+
+- Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+- Run the CLI command exactly; do not paraphrase its output.
+- Cite any file paths or hashes you produce.
+
+Steps:
+
+1. Run `ai-sdlc doctor --json` and parse the structured output.
+2. List each FAIL/WARN with the exact file path involved.
+3. Recommend `ai-sdlc repair` only for items it can safely fix.
+
+When to invoke: the framework feels broken or after major edits to .github/ or docs/.

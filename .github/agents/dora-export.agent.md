@@ -1,0 +1,40 @@
+---
+name: DoraExport
+description: "Export DORA metrics (lead time, deploy freq, MTTR, change-fail) from events."
+tools: ["edit/editFiles","search/codebase","execute/runInTerminal"]
+argument-hint: "[--since <date>] [--out path]"
+---
+# DORAEXPORT AGENT
+
+Capability: `ai-sdlc dora-export`
+
+## PRE (mandatory)
+
+Read:
+
+- `AGENTS.md`
+- `docs/agent-memory/00-anti-hallucination-charter.md`
+- `docs/agent-memory/index.json`
+
+## WHEN to use
+
+Use when the team reviews delivery health.
+
+## TASK
+
+1. Run `ai-sdlc dora-export --out docs/agent-memory/metrics/dora.json`.
+2. Render trends in the dashboard or a separate report.
+3. Note any anomaly that warrants a postmortem.
+
+Quote any output you cite (paths, hashes, exit codes). Do not
+summarize without reading the actual artifact.
+
+## POST (mandatory)
+
+- Append an event of type `dora-export` to `docs/agent-memory/index.json`.
+- Write a run log under `docs/agent-logs/YYYY-MM-DD__dora-export.md`.
+- If the run produced a new file, record its sha256 in the log.
+
+---
+
+`<!-- AHC:BEGIN -->` and `<!-- AHC:END -->`

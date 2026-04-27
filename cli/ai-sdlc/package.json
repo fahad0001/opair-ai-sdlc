@@ -1,6 +1,6 @@
 {
   "name": "@opair/ai-sdlc",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.4",
   "description": "Universal AI-assisted project bootstrapper and SDLC framework — anti-hallucination by construction.",
   "type": "module",
   "license": "MIT",

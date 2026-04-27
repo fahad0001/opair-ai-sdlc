@@ -41,6 +41,23 @@ Every claim in memory is backed by evidence (file, command, or human input). Con
 
 ---
 
+## Pick exactly one entry flow
+
+The framework supports three mutually exclusive entry points. Running more than
+one in the same directory tree creates duplicate memory packs and is now
+hard-blocked (use `--force` to override). Pick the one that matches your
+situation:
+
+| Flow                        | When to use it                                                            | Command                                                                  |
+| --------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **`init`**                  | You already have an empty/new repo and know roughly what you're building. | `ai-sdlc init`                                                           |
+| **`brainstorm` → `create`** | You don't yet know what to build — start from a problem statement.        | `ai-sdlc brainstorm` then `ai-sdlc create --from-brief project-brief.md` |
+| **`adopt`**                 | You have an existing repo with code and want to retrofit the framework.   | `ai-sdlc adopt --deep`                                                   |
+
+After any of these, run more capabilities later with `ai-sdlc add` (see below).
+
+---
+
 ## Quick start
 
 ### New project (interactive)
@@ -49,7 +66,9 @@ Every claim in memory is backed by evidence (file, command, or human input). Con
 npx @opair/ai-sdlc init
 ```
 
-`init` asks for your project name, kind, and stack, then scaffolds everything.
+`init` asks for the project name, kind, stack, vendors, and which **capability
+categories** to include. The default ships only the SDLC core + diagnostics —
+small and focused. Add more later with `ai-sdlc add <category|id>`.
 
 ### Adopt an existing project
 
@@ -58,6 +77,81 @@ npx @opair/ai-sdlc adopt
 ```
 
 Inspects existing code (PRs, issues, READMEs, ADRs) and imports them as requirements without touching your source.
+
+---
+
+## Capability categories
+
+To keep new projects from drowning in prompts, the framework splits non-core
+agents/prompts/workflows into opt-in categories:
+
+| Category      | What it adds                                                                 | Capabilities                                                      |
+| ------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `diagnostics` | Health-check + repair the memory pack                                        | `audit`, `doctor`, `repair`, `validate`, `status`                 |
+| `visibility`  | Dashboards, dependency graph, per-requirement reports                        | `dashboard`, `graph`, `report`                                    |
+| `provenance`  | Hash-pinned context packs + signed attestations                              | `context-pack`, `verify-pack`, `attest-pack`, `provenance-verify` |
+| `security`    | SBOM checks, threat-coverage gates, license policy (+ `sbom.yml` workflow)   | `sbom-check`, `sbom-diff`, `threat-coverage`                      |
+| `release`     | DORA, release notes, changelog, MSRD (+ `release.yml`, `msrd.yml` workflows) | `dora-export`, `release-notes`, `changelog`, `msrd`               |
+| `memory`      | Known-issues, ingestion, promotion, archival                                 | `ki`, `ingest`, `promote`, `archive`                              |
+| `workflows`   | Brownfield + autonomous orchestrator agents                                  | `adopt`, `autopilot`                                              |
+
+The SDLC pipeline (10 agents, 8 prompts, scoped instructions) is **always
+included** — categories are additive on top.
+
+```bash
+ai-sdlc init --capabilities security,release        # at scaffold time
+ai-sdlc init --capabilities all                     # ship everything
+
+ai-sdlc add security                                 # later: add a category
+ai-sdlc add sbom-check threat-coverage               # or pick individual ids
+ai-sdlc add                                          # no args → list catalog
+```
+
+### Brainstorm → create flow
+
+```bash
+mkdir my-thing && cd my-thing            # fresh, EMPTY directory
+ai-sdlc brainstorm                       # writes project-brief.{md,json} here
+ai-sdlc create --from-brief project-brief.md
+# → scaffolds the project under ./<project-name>/
+# → moves the brief into <project-name>/docs/agent-memory/00-brief.md
+# → cleans up project-brief.{md,json} from the parent
+```
+
+After `create` finishes, `cd <project-name>` — **that** is your framework root.
+The original directory is now empty (or holds whatever else you put there).
+
+`brainstorm` refuses to run inside an existing framework root or any descendant
+of one, so you can't accidentally nest projects.
+
+**Esc-to-skip.** Inside the wizard, only `title` and `problem statement` are
+required. Pressing `Esc` (or empty-Enter) on any other prompt skips that field
+instead of aborting the session. Persona/risk loops stop the same way.
+
+### AI-assisted brainstorm (`--ai`)
+
+For a richer back-and-forth than a one-shot wizard, run:
+
+```bash
+mkdir my-thing && cd my-thing
+ai-sdlc brainstorm --ai
+# writes:
+#   brainstorm.prompt.md          (the dialog instructions)
+#   project-brief.template.json   (the schema skeleton)
+```
+
+Open `brainstorm.prompt.md` inside Copilot, Claude Code, Cursor, opencode,
+Continue, Aider, or any agent that can read local files. The agent then
+**dialogs** with you — one focused question at a time, no invention, surfacing
+tradeoffs — until you confirm. It writes the final `project-brief.md` +
+`project-brief.json` for you. Then:
+
+```bash
+ai-sdlc create --from-brief project-brief.md
+```
+
+This is the recommended path when the project is fuzzy or when you want the
+agent to challenge weak metrics, missing personas, or contradictory scope.
 
 ### Global install
 
@@ -78,25 +172,21 @@ Available stacks: `next-app-router-ts`, `expo-router`, `node-fastify-ts`, `node-
 
 ## Brainstorm → create → ship
 
-If you don't yet know what you're building, start with brainstorm:
-
-```bash
-ai-sdlc brainstorm                        # interactive intake
-ai-sdlc brainstorm --resume brief.json    # resume a saved brief
-ai-sdlc create --from-brief brief.json    # scaffold requirements from the brief
-```
-
-Outputs are AHC-compliant — every answer is recorded as `evidence.kind=human`.
+If you don't yet know what you're building, start with brainstorm in a fresh
+empty directory (see [Brainstorm → create flow](#brainstorm--create-flow)
+above). Outputs are AHC-compliant — every answer is recorded as
+`evidence.kind=human`.
 
 ---
 
 ## Day-to-day commands
 
 ```text
-ai-sdlc init                        scaffold a project
+ai-sdlc init [--capabilities ...]   scaffold a project (default: diagnostics)
 ai-sdlc brainstorm                  interactive intake → project-brief.{md,json}
-ai-sdlc create [--from-brief ...]   create a requirement folder + meta
+ai-sdlc create [--from-brief ...]   scaffold a project from a brief
 ai-sdlc adopt [--deep]              import an existing project
+ai-sdlc add <category|id> [...]     add capabilities to an existing root
 ai-sdlc autopilot [...]             autonomous SDLC orchestrator
 
 ai-sdlc status                      quick state of all requirements

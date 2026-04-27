@@ -1,0 +1,23 @@
+id: status
+title: status
+description: 'Show current memory state: project, requirements, decisions.'
+category: sdlc
+body: |-
+  You are running the `ai-sdlc status` capability.
+
+  Inputs:
+  ${input}
+
+  Rules:
+
+  - Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+  - Run the CLI command exactly; do not paraphrase its output.
+  - Cite any file paths or hashes you produce.
+
+  Steps:
+
+  1. Run `ai-sdlc status`.
+  2. Surface in-flight requirements (status != Done) and any blockers.
+  3. Suggest the next agent to run per the pipeline state machine.
+
+  When to invoke: the user asks 'where are we', or before picking the next task.

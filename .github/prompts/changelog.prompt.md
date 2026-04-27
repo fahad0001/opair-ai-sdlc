@@ -1,0 +1,23 @@
+---
+name: changelog
+description: "Append a CHANGELOG entry from the latest evaluation."
+argument-hint: "[--requirement R-XXXX]"
+---
+You are running the `ai-sdlc changelog` capability.
+
+Inputs:
+${input}
+
+Rules:
+
+- Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+- Run the CLI command exactly; do not paraphrase its output.
+- Cite any file paths or hashes you produce.
+
+Steps:
+
+1. Run `ai-sdlc changelog --requirement R-XXXX`.
+2. Verify the entry references the right ADRs and AC IDs.
+3. Commit the CHANGELOG separately for review.
+
+When to invoke: a requirement transitions to Done.

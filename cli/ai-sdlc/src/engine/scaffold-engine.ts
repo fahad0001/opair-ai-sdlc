@@ -7,6 +7,8 @@ import { renderPrompts, loadPrompts } from "./prompt-renderers.js";
 import type { WizardAnswers } from "../types.js";
 import { writeMemoryIndex } from "./memory.js";
 import { sha256OfFile } from "./hashes.js";
+import { resolveCapabilities, DEFAULT_CATEGORIES } from "./capabilities.js";
+import { filterCapabilities } from "./capability-filter.js";
 
 /**
  * High-level scaffold orchestrator.
@@ -136,6 +138,22 @@ export const scaffoldProject = async (
 
   // 6. Emit polish/quality-of-life files (idempotent; skip if exists).
   writePolishFiles(answers.targetDir, written, skipped);
+
+  // 7. Filter capability files per `answers.capabilities`. SDLC-core
+  //    agents/prompts/instructions are always preserved by the
+  //    filter (it only deletes things in the capability registry).
+  const selectors =
+    answers.capabilities && answers.capabilities.length > 0
+      ? answers.capabilities
+      : (DEFAULT_CATEGORIES as readonly string[]);
+  const { capabilities, categories } = resolveCapabilities(selectors);
+  const removed = filterCapabilities(
+    answers.targetDir,
+    capabilities,
+    categories,
+  );
+  // Track removed entries so callers can report them.
+  for (const r of removed) skipped.push(`removed:${r}`);
 
   return { written, skipped, vendors: answers.vendors };
 };

@@ -1,0 +1,23 @@
+---
+name: report
+description: "Compose a per-requirement report from memory + execution + evaluation."
+argument-hint: "--requirement R-XXXX [--out path]"
+---
+You are running the `ai-sdlc report` capability.
+
+Inputs:
+${input}
+
+Rules:
+
+- Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+- Run the CLI command exactly; do not paraphrase its output.
+- Cite any file paths or hashes you produce.
+
+Steps:
+
+1. Run `ai-sdlc report --requirement R-XXXX`.
+2. Cross-link plan, execution, evaluation artifacts in the response.
+3. Flag any missing post-conditions per AGENTS.md §3.
+
+When to invoke: a requirement reaches Evaluated/Done and needs a stakeholder summary.

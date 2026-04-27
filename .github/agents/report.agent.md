@@ -1,0 +1,40 @@
+---
+name: Report
+description: "Compose a per-requirement report from memory + execution + evaluation."
+tools: ["edit/editFiles","search/codebase","execute/runInTerminal"]
+argument-hint: "--requirement R-XXXX [--out path]"
+---
+# REPORT AGENT
+
+Capability: `ai-sdlc report`
+
+## PRE (mandatory)
+
+Read:
+
+- `AGENTS.md`
+- `docs/agent-memory/00-anti-hallucination-charter.md`
+- `docs/agent-memory/index.json`
+
+## WHEN to use
+
+Use when a requirement reaches Evaluated/Done and needs a stakeholder summary.
+
+## TASK
+
+1. Run `ai-sdlc report --requirement R-XXXX`.
+2. Cross-link plan, execution, evaluation artifacts in the response.
+3. Flag any missing post-conditions per AGENTS.md §3.
+
+Quote any output you cite (paths, hashes, exit codes). Do not
+summarize without reading the actual artifact.
+
+## POST (mandatory)
+
+- Append an event of type `report` to `docs/agent-memory/index.json`.
+- Write a run log under `docs/agent-logs/YYYY-MM-DD__report.md`.
+- If the run produced a new file, record its sha256 in the log.
+
+---
+
+`<!-- AHC:BEGIN -->` and `<!-- AHC:END -->`

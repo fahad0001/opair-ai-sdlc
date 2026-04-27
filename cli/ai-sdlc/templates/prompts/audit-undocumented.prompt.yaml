@@ -1,0 +1,15 @@
+id: audit-undocumented
+title: audit-undocumented
+description: Run AuditMeta to detect undocumented features/decisions and propose/auto-create requirements and ADRs.
+category: sdlc
+body: |-
+
+  Run the AuditMeta agent over scope=${input:scope} and produce:
+
+  - `docs/agent-memory/09-audits/YYYY-MM-DD__audit-meta.md`
+
+  Rules:
+
+  - Every finding must include evidence file paths.
+  - Do not fabricate.
+  - Recommend requirements/ADRs to close gaps.

@@ -1,0 +1,23 @@
+---
+name: msrd
+description: "Render the Most-Significant-Requirements digest from index.json."
+argument-hint: "[--top n] [--out path]"
+---
+You are running the `ai-sdlc msrd` capability.
+
+Inputs:
+${input}
+
+Rules:
+
+- Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+- Run the CLI command exactly; do not paraphrase its output.
+- Cite any file paths or hashes you produce.
+
+Steps:
+
+1. Run `ai-sdlc msrd --top 20 --out docs/agent-memory/msrd.md`.
+2. Highlight blocked or stalled requirements.
+3. Link the digest from the dashboard.
+
+When to invoke: weekly review or release-readiness check.

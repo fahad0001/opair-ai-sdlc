@@ -1,0 +1,23 @@
+id: validate
+title: validate
+description: Run schema + AHC + hash + guard checks against the memory pack.
+category: sdlc
+body: |-
+  You are running the `ai-sdlc validate` capability.
+
+  Inputs:
+  ${input}
+
+  Rules:
+
+  - Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+  - Run the CLI command exactly; do not paraphrase its output.
+  - Cite any file paths or hashes you produce.
+
+  Steps:
+
+  1. Run `ai-sdlc validate`.
+  2. On failure, identify the exact rule (schema/AHC/hash/guard).
+  3. Fix in source files; never edit generated outputs to silence checks.
+
+  When to invoke: before each commit, after editing index.json, or on CI failure.

@@ -1,5 +1,9 @@
 import { runWizard } from "../engine/wizard.js";
 import { scaffoldProject } from "../engine/scaffold-engine.js";
+import {
+  detectFramework,
+  findFrameworkAncestor,
+} from "../engine/framework-detect.js";
 import { log } from "../util/log.js";
 import { execa } from "execa";
 import { loadBrief } from "../engine/brainstorm.js";
@@ -20,6 +24,7 @@ export interface CreateOptions {
   name?: string;
   yes?: boolean;
   fromBrief?: string;
+  force?: boolean;
   preset?: Partial<import("../types.js").WizardAnswers>;
 }
 
@@ -47,6 +52,27 @@ export const cmdCreate = async (opts: CreateOptions): Promise<void> => {
       ...(opts.name ? { projectName: opts.name } : {}),
     },
   });
+
+  // Duplication guards (see framework-detect.ts).
+  // Allow scaffolding into an empty/new dir, but refuse if it already
+  // has the framework, or if any ancestor does (would nest a duplicate).
+  const targetPresence = detectFramework(answers.targetDir);
+  if (targetPresence.present && !opts.force) {
+    throw new Error(
+      `Target directory ${answers.targetDir} already contains the ai-sdlc framework ` +
+        `(found: ${targetPresence.markers.join(", ")}). ` +
+        `Use --force to overwrite, or pick a different target.`,
+    );
+  }
+  const ancestor = findFrameworkAncestor(answers.targetDir);
+  if (ancestor && !opts.force) {
+    throw new Error(
+      `An ancestor directory (${ancestor}) already contains the ai-sdlc framework. ` +
+        `Creating a project here would produce a duplicate memory pack at two levels. ` +
+        `Move the new project outside of ${ancestor}, or pass --force to override.`,
+    );
+  }
+
   log.banner(`Scaffolding ${answers.projectName} → ${answers.targetDir}`);
   const result = await scaffoldProject(answers);
   log.ok(
@@ -58,7 +84,9 @@ export const cmdCreate = async (opts: CreateOptions): Promise<void> => {
   writeLock(answers.targetDir, defaultLock(answers.projectKind));
   log.ok("bootstrap.lock written (Definition-of-Ready gate)");
 
-  // Persist brief inside project for traceability.
+  // Persist brief inside project for traceability, then clean up the
+  // brief artifacts at the brainstorm location (parent of the new
+  // project) so the framework lives only inside `targetDir`.
   if (answers.brief) {
     const fs = await import("node:fs");
     const target = path.join(
@@ -69,6 +97,29 @@ export const cmdCreate = async (opts: CreateOptions): Promise<void> => {
     const { briefToMarkdown } = await import("../engine/brainstorm.js");
     fs.writeFileSync(target, briefToMarkdown(answers.brief), "utf8");
     log.ok("project brief copied to docs/agent-memory/00-brief.md");
+
+    if (opts.fromBrief) {
+      const briefPath = path.resolve(opts.cwd, opts.fromBrief);
+      const briefJson = briefPath.replace(/\.md$/i, ".json");
+      // Only remove if outside the new project (to avoid deleting
+      // the just-written 00-brief.md inside it).
+      const inside = path
+        .resolve(briefPath)
+        .startsWith(path.resolve(answers.targetDir) + path.sep);
+      if (!inside) {
+        for (const p of [briefPath, briefJson]) {
+          try {
+            if (fs.existsSync(p)) fs.unlinkSync(p);
+          } catch {
+            /* ignore */
+          }
+        }
+        log.dim(
+          `removed brief at ${path.relative(opts.cwd, briefPath)} ` +
+            `(now lives inside the new project).`,
+        );
+      }
+    }
   }
 
   if (answers.initGit) {

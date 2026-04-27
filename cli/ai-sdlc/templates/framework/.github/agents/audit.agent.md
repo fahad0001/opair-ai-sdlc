@@ -1,0 +1,40 @@
+---
+name: Audit
+description: "Audit memory + requirements + ADRs + KIs and write a dated report."
+tools: ["edit/editFiles","search/codebase","execute/runInTerminal"]
+argument-hint: "[--out path] [--fix]"
+---
+# AUDIT AGENT
+
+Capability: `ai-sdlc audit`
+
+## PRE (mandatory)
+
+Read:
+
+- `AGENTS.md`
+- `docs/agent-memory/00-anti-hallucination-charter.md`
+- `docs/agent-memory/index.json`
+
+## WHEN to use
+
+Use when memory health is in question, before a release, or on demand.
+
+## TASK
+
+1. Run `ai-sdlc audit` (use `--fix` only when a self-heal is desired).
+2. Read the dated report under `docs/agent-memory/09-audits/`.
+3. Summarize highest-severity findings and propose fixes (one per finding).
+
+Quote any output you cite (paths, hashes, exit codes). Do not
+summarize without reading the actual artifact.
+
+## POST (mandatory)
+
+- Append an event of type `audit` to `docs/agent-memory/index.json`.
+- Write a run log under `docs/agent-logs/YYYY-MM-DD__audit.md`.
+- If the run produced a new file, record its sha256 in the log.
+
+---
+
+`<!-- AHC:BEGIN -->` and `<!-- AHC:END -->`

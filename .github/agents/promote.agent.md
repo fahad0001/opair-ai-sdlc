@@ -1,0 +1,40 @@
+---
+name: Promote
+description: "Promote a known-issue or audit finding into a full requirement."
+tools: ["edit/editFiles","search/codebase","execute/runInTerminal"]
+argument-hint: "--ki KI-XXXX | --finding <id>"
+---
+# PROMOTE AGENT
+
+Capability: `ai-sdlc promote`
+
+## PRE (mandatory)
+
+Read:
+
+- `AGENTS.md`
+- `docs/agent-memory/00-anti-hallucination-charter.md`
+- `docs/agent-memory/index.json`
+
+## WHEN to use
+
+Use when a recurring KI now warrants planning effort.
+
+## TASK
+
+1. Run `ai-sdlc promote --ki KI-XXXX`.
+2. Hand off to the Plan agent for the new R-XXXX.
+3. Mark the source KI as RESOLVED with reference to the new R-id.
+
+Quote any output you cite (paths, hashes, exit codes). Do not
+summarize without reading the actual artifact.
+
+## POST (mandatory)
+
+- Append an event of type `promote` to `docs/agent-memory/index.json`.
+- Write a run log under `docs/agent-logs/YYYY-MM-DD__promote.md`.
+- If the run produced a new file, record its sha256 in the log.
+
+---
+
+`<!-- AHC:BEGIN -->` and `<!-- AHC:END -->`

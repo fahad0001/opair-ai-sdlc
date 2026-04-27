@@ -43,6 +43,25 @@ const writeFile = (root: string, rel: string, content: string): string => {
   return rel;
 };
 
+/**
+ * Additive write: only emit if the file does not already exist in the
+ * target. Used so that vendor renderers do not clobber files copied
+ * verbatim from `templates/framework/` (e.g. the real SDLC agents
+ * synced from the source repo). Returns the rel path if written, or
+ * `null` if the file already existed.
+ */
+const writeFileIfMissing = (
+  root: string,
+  rel: string,
+  content: string,
+): string | null => {
+  const abs = path.join(root, rel);
+  if (fs.existsSync(abs)) return null;
+  ensureDir(path.dirname(abs));
+  fs.writeFileSync(abs, content, "utf8");
+  return rel;
+};
+
 /* ------------------------- Copilot ----------------------------- */
 /**
  * GitHub Copilot ingests:
@@ -52,6 +71,12 @@ const writeFile = (root: string, rel: string, content: string): string => {
  *
  * We emit the per-agent files with YAML frontmatter and the Markdown
  * body, then a top-level copilot-instructions.md with framework rules.
+ *
+ * IMPORTANT: This renderer is ADDITIVE — it never overwrites a file
+ * that already exists in the target. The canonical agents+instructions
+ * are shipped via `templates/framework/.github/` (synced from the
+ * source repo) and copied first by the scaffolder. The renderer fills
+ * gaps for agents/prompts that have no canonical Markdown shipped.
  */
 const copilotRenderer: VendorRenderer = {
   vendor: "copilot",
@@ -70,11 +95,16 @@ const copilotRenderer: VendorRenderer = {
         ? `${a.body.trimEnd()}\n\n---\n\n${ctx.ahcBlock}\n`
         : `${a.body.trimEnd()}\n`;
       const out = `---\n${frontmatter}\n---\n\n${body}`;
-      written.push(
-        writeFile(ctx.targetRoot, `.github/agents/${a.id}.agent.md`, out),
+      const rel = writeFileIfMissing(
+        ctx.targetRoot,
+        `.github/agents/${a.id}.agent.md`,
+        out,
       );
+      if (rel) written.push(rel);
     }
-    // Workspace-wide Copilot instructions pointing at the framework.
+    // Workspace-wide Copilot instructions: only write if a canonical
+    // copilot-instructions.md was not already shipped via the framework
+    // template (the real one in the repo is fuller than this stub).
     const ci = [
       "# Copilot Instructions (Workspace)",
       "",
@@ -83,9 +113,12 @@ const copilotRenderer: VendorRenderer = {
       "",
       "Use the agents under `.github/agents/` to drive the SDLC pipeline.",
     ].join("\n");
-    written.push(
-      writeFile(ctx.targetRoot, ".github/copilot-instructions.md", ci + "\n"),
+    const ciRel = writeFileIfMissing(
+      ctx.targetRoot,
+      ".github/copilot-instructions.md",
+      ci + "\n",
     );
+    if (ciRel) written.push(ciRel);
     return written;
   },
 };

@@ -1,0 +1,23 @@
+---
+name: dashboard
+description: "Emit/serve a zero-build dashboard.html next to index.json."
+argument-hint: "[--serve] [--port n] [--host h]"
+---
+You are running the `ai-sdlc dashboard` capability.
+
+Inputs:
+${input}
+
+Rules:
+
+- Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+- Run the CLI command exactly; do not paraphrase its output.
+- Cite any file paths or hashes you produce.
+
+Steps:
+
+1. Run `ai-sdlc dashboard` (or `--serve` for live).
+2. Confirm `docs/agent-memory/dashboard.html` exists.
+3. Provide the file:// or http:// URL for the user.
+
+When to invoke: stakeholders need a snapshot or a live view.

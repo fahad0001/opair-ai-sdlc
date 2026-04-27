@@ -1,0 +1,40 @@
+---
+name: KnownIssues
+description: "Manage known-issues.md entries (list/add/resolve)."
+tools: ["edit/editFiles","search/codebase","execute/runInTerminal"]
+argument-hint: "list|add|resolve"
+---
+# KNOWNISSUES AGENT
+
+Capability: `ai-sdlc ki`
+
+## PRE (mandatory)
+
+Read:
+
+- `AGENTS.md`
+- `docs/agent-memory/00-anti-hallucination-charter.md`
+- `docs/agent-memory/index.json`
+
+## WHEN to use
+
+Use when an issue is discovered that doesn't yet warrant a full requirement.
+
+## TASK
+
+1. List with `ai-sdlc ki list --json` to inspect.
+2. Add with `ai-sdlc ki add "title" --severity low|medium|high`.
+3. Resolve with `ai-sdlc ki resolve KI-XXXX --note "..."`.
+
+Quote any output you cite (paths, hashes, exit codes). Do not
+summarize without reading the actual artifact.
+
+## POST (mandatory)
+
+- Append an event of type `ki` to `docs/agent-memory/index.json`.
+- Write a run log under `docs/agent-logs/YYYY-MM-DD__ki.md`.
+- If the run produced a new file, record its sha256 in the log.
+
+---
+
+`<!-- AHC:BEGIN -->` and `<!-- AHC:END -->`

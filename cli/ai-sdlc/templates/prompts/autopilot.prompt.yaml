@@ -1,0 +1,23 @@
+id: autopilot
+title: autopilot
+description: Run requirements through the full SDLC pipeline autonomously.
+category: sdlc
+body: |-
+  You are running the `ai-sdlc autopilot` capability.
+
+  Inputs:
+  ${input}
+
+  Rules:
+
+  - Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+  - Run the CLI command exactly; do not paraphrase its output.
+  - Cite any file paths or hashes you produce.
+
+  Steps:
+
+  1. Run `ai-sdlc autopilot --requirement all --dry-run` first.
+  2. Confirm the plan, then re-run without `--dry-run`.
+  3. Watch `docs/agent-logs/` for per-requirement results.
+
+  When to invoke: many requirements are queued and ready for unattended execution.

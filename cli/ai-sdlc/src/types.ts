@@ -127,6 +127,13 @@ export interface WizardAnswers {
   license: "MIT" | "Apache-2.0" | "GPL-3.0" | "BSL-1.1" | "proprietary";
   /** Optional brief produced by `ai-sdlc brainstorm`. */
   brief?: BrainstormBrief;
+  /**
+   * Capability selectors (categories or capability ids).
+   * - `["all"]` ships every capability.
+   * - Empty/omitted → default = ["diagnostics"] (see capabilities.ts).
+   * SDLC-core agents/prompts are always shipped regardless.
+   */
+  capabilities?: string[];
 }
 
 export interface BrainstormBrief {

@@ -1,0 +1,23 @@
+---
+name: promote
+description: "Promote a known-issue or audit finding into a full requirement."
+argument-hint: "--ki KI-XXXX | --finding <id>"
+---
+You are running the `ai-sdlc promote` capability.
+
+Inputs:
+${input}
+
+Rules:
+
+- Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+- Run the CLI command exactly; do not paraphrase its output.
+- Cite any file paths or hashes you produce.
+
+Steps:
+
+1. Run `ai-sdlc promote --ki KI-XXXX`.
+2. Hand off to the Plan agent for the new R-XXXX.
+3. Mark the source KI as RESOLVED with reference to the new R-id.
+
+When to invoke: a recurring KI now warrants planning effort.

@@ -19,6 +19,7 @@ import {
   type CiProvider,
 } from "../types.js";
 import { STACKS, recommendedStackFor, stacksFor } from "./registry.js";
+import { CAPABILITY_CATEGORIES, DEFAULT_CATEGORIES } from "./capabilities.js";
 
 /**
  * 13-step interactive wizard. Each prompt has a documented best-practice
@@ -71,6 +72,7 @@ export const runWizard = async (
     addMcpServer: preset.addMcpServer ?? false,
     license: preset.license ?? "MIT",
     ...(preset.brief ? { brief: preset.brief } : {}),
+    capabilities: preset.capabilities ?? [...DEFAULT_CATEGORIES],
   };
 
   if (!answers.projectName && !yes) {
@@ -301,6 +303,28 @@ export const runWizard = async (
       }),
     );
     answers.ciProvider = v as CiProvider;
+  }
+
+  // Capability categories — opt-in groups of agents/prompts/workflows
+  // beyond the SDLC core. Default = ["diagnostics"]. The user can add
+  // more later with `ai-sdlc add <category|id>`.
+  if (!preset.capabilities && !yes) {
+    const v = must(
+      await p.multiselect({
+        message:
+          "Capability categories (in addition to the SDLC core)? Space to toggle, Enter to confirm.",
+        options: CAPABILITY_CATEGORIES.map((c) => ({
+          value: c.id,
+          label: c.label,
+          hint: c.description,
+        })),
+        initialValues: [...DEFAULT_CATEGORIES],
+        required: false,
+      }),
+    );
+    answers.capabilities = (v as string[]) ?? [];
+  } else if (!preset.capabilities) {
+    answers.capabilities = [...DEFAULT_CATEGORIES];
   }
 
   if (!yes) p.outro(`Scaffolding ${answers.projectName} (${answers.stackId})…`);

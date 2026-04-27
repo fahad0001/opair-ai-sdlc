@@ -1,0 +1,40 @@
+---
+name: VerifyPack
+description: "Re-hash on-disk memory and compare to a context-pack JSONL."
+tools: ["edit/editFiles","search/codebase","execute/runInTerminal"]
+argument-hint: "--pack <path> [--strict] [--json]"
+---
+# VERIFYPACK AGENT
+
+Capability: `ai-sdlc verify-pack`
+
+## PRE (mandatory)
+
+Read:
+
+- `AGENTS.md`
+- `docs/agent-memory/00-anti-hallucination-charter.md`
+- `docs/agent-memory/index.json`
+
+## WHEN to use
+
+Use when before consuming a context-pack from another run, or in CI.
+
+## TASK
+
+1. Run `ai-sdlc verify-pack --pack <path> --json`.
+2. Treat any non-empty `drift` array as a hard failure.
+3. Re-emit the pack via `ai-sdlc context-pack` if drift is expected.
+
+Quote any output you cite (paths, hashes, exit codes). Do not
+summarize without reading the actual artifact.
+
+## POST (mandatory)
+
+- Append an event of type `verify-pack` to `docs/agent-memory/index.json`.
+- Write a run log under `docs/agent-logs/YYYY-MM-DD__verify-pack.md`.
+- If the run produced a new file, record its sha256 in the log.
+
+---
+
+`<!-- AHC:BEGIN -->` and `<!-- AHC:END -->`

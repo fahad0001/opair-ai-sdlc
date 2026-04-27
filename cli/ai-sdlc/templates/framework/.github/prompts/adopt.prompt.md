@@ -1,0 +1,23 @@
+---
+name: adopt
+description: "Brownfield: install the framework into an existing repo (no scaffolding)."
+argument-hint: "[path] [--vendors copilot,cursor,...] [--deep] [--apply-fixes]"
+---
+You are running the `ai-sdlc adopt` capability.
+
+Inputs:
+${input}
+
+Rules:
+
+- Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+- Run the CLI command exactly; do not paraphrase its output.
+- Cite any file paths or hashes you produce.
+
+Steps:
+
+1. Run `ai-sdlc adopt --vendors copilot --deep` from the target repo root.
+2. Review the deep-detection report before `--apply-fixes`.
+3. Commit the new memory pack as a separate PR.
+
+When to invoke: the user has an existing project that needs the SDLC framework added.

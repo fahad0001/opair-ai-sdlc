@@ -1,0 +1,40 @@
+---
+name: ThreatCoverage
+description: "Check coverage of the threat model matrix against requirements."
+tools: ["edit/editFiles","search/codebase","execute/runInTerminal"]
+argument-hint: "[--kind ai|api|web|...]"
+---
+# THREATCOVERAGE AGENT
+
+Capability: `ai-sdlc threat-coverage`
+
+## PRE (mandatory)
+
+Read:
+
+- `AGENTS.md`
+- `docs/agent-memory/00-anti-hallucination-charter.md`
+- `docs/agent-memory/index.json`
+
+## WHEN to use
+
+Use when during planning of security-sensitive requirements.
+
+## TASK
+
+1. Run `ai-sdlc threat-coverage`.
+2. Map missing kinds to STRIDE/LINDDUN categories.
+3. Open a follow-up requirement for any gap that is in scope.
+
+Quote any output you cite (paths, hashes, exit codes). Do not
+summarize without reading the actual artifact.
+
+## POST (mandatory)
+
+- Append an event of type `threat-coverage` to `docs/agent-memory/index.json`.
+- Write a run log under `docs/agent-logs/YYYY-MM-DD__threat-coverage.md`.
+- If the run produced a new file, record its sha256 in the log.
+
+---
+
+`<!-- AHC:BEGIN -->` and `<!-- AHC:END -->`

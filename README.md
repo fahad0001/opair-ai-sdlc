@@ -121,7 +121,43 @@ ai-sdlc --help
 
 This is the typical consumer flow.
 
-### Option A — `npx` (recommended)
+### Pick exactly one entry point
+
+The framework supports three mutually exclusive entry points. Running more than
+one in the same directory tree creates duplicate memory packs and is
+hard-blocked (use `--force` to override):
+
+| Flow                        | When                                                                | Command                                                                  |
+| --------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **`init`**                  | Empty/new repo, you know roughly what you're building               | `npx @opair/ai-sdlc init`                                                |
+| **`brainstorm` → `create`** | You don't yet know what to build — start from the problem statement | `ai-sdlc brainstorm` then `ai-sdlc create --from-brief project-brief.md` |
+| **`adopt`**                 | Existing repo with code; retrofit the framework                     | `npx @opair/ai-sdlc adopt --deep`                                        |
+
+### Capability categories (default = lean)
+
+`init` no longer scaffolds every agent/prompt/workflow. Instead it asks which
+**capability categories** to include and ships only those. The SDLC core (10
+agents, 8 prompts, scoped instructions) is always present.
+
+| Category      | Adds                                                                           |
+| ------------- | ------------------------------------------------------------------------------ |
+| `diagnostics` | `audit`, `doctor`, `repair`, `validate`, `status` — **default**                |
+| `visibility`  | `dashboard`, `graph`, `report`                                                 |
+| `provenance`  | `context-pack`, `verify-pack`, `attest-pack`, `provenance-verify`              |
+| `security`    | `sbom-check`, `sbom-diff`, `threat-coverage` (+ `sbom.yml` workflow)           |
+| `release`     | `dora-export`, `release-notes`, `changelog`, `msrd` (+ release/msrd workflows) |
+| `memory`      | `ki`, `ingest`, `promote`, `archive`                                           |
+| `workflows`   | `adopt`, `autopilot`                                                           |
+
+```bash
+ai-sdlc init --capabilities security,release    # at scaffold time
+ai-sdlc init --capabilities all                 # everything
+ai-sdlc add security                            # add later
+ai-sdlc add sbom-check threat-coverage          # individual ids
+ai-sdlc add                                     # no args → list catalog
+```
+
+### Option A — `npx init` (recommended for new repos)
 
 ```bash
 # inside an empty (or existing) project directory
@@ -130,39 +166,67 @@ npx @opair/ai-sdlc init
 
 `init` is interactive. It will:
 
-1. Detect or ask for project metadata (name, kind, stack).
-2. Scaffold `docs/agent-memory/`, `AGENTS.md`, `.github/agents/`, prompts, scripts, workflows.
-3. Emit per-vendor AI rule files (`.github/copilot-instructions.md`, `.cursorrules`, `CLAUDE.md`, `.windsurfrules`, `.clinerules`, `AIDER_CONVENTIONS.md`, `.continue/config.yaml`, `opencode.json`, `.mcp/agents.json`).
-4. Stamp `bootstrap.lock` so future commands know the project is initialized.
+1. Ask for project metadata (name, kind, stack, vendors).
+2. Ask which **capability categories** to include (default: `diagnostics`).
+3. Scaffold `docs/agent-memory/`, `AGENTS.md`, `.github/agents/`, prompts,
+   scripts, workflows — filtered to the selected categories.
+4. Emit per-vendor AI rule files (Copilot, Cursor, Claude, Windsurf, Cline,
+   Aider, Continue, opencode, MCP).
+5. Stamp `bootstrap.lock` so future commands know the project is initialized.
 
 ### Option B — Adopt an existing repo
 
 ```bash
 npx @opair/ai-sdlc adopt
-# or, deeper detection:
 npx @opair/ai-sdlc adopt --deep
 ```
 
-`adopt` inspects what already exists (PRs, issues, ADRs, READMEs) and proposes requirements + ADRs to import without overwriting your code.
+`adopt` inspects what already exists (PRs, issues, ADRs, READMEs) and proposes
+requirements + ADRs to import without overwriting your code.
 
-### Option C — Brainstorm first, then init
+### Option C — Brainstorm first, then create
 
-If you don't yet know what you're building:
+If you don't yet know what you're building, work in a **fresh empty
+directory** (`brainstorm` refuses to run inside an existing framework root).
+You have two modes:
+
+**C1. Interactive wizard** — quick, structured, runs locally:
 
 ```bash
+mkdir my-thing && cd my-thing
 npx @opair/ai-sdlc brainstorm
+# → writes project-brief.{md,json} here
+
+npx @opair/ai-sdlc create --from-brief project-brief.md
+# → scaffolds the project under ./<project-name>/
+# → moves the brief into <project-name>/docs/agent-memory/00-brief.md
+# → cleans up project-brief.{md,json} from the parent
 ```
 
-This walks you through an interactive intake (problem, users, personas, constraints, NFRs, risks). It writes:
+Inside the wizard only `title` and `problem statement` are required —
+press `Esc` (or empty-Enter) on any other prompt to skip that field
+instead of aborting the session.
 
-- `project-brief.md`
-- `project-brief.json`
-
-Both are resumable (`ai-sdlc brainstorm --resume project-brief.json`). Feed the brief into init/create:
+**C2. AI-assisted dialog** — richer back-and-forth via your AI assistant
+(Copilot, Claude Code, Cursor, opencode, Continue, Aider, …):
 
 ```bash
-npx @opair/ai-sdlc create --from-brief project-brief.json
+mkdir my-thing && cd my-thing
+npx @opair/ai-sdlc brainstorm --ai
+# → writes brainstorm.prompt.md + project-brief.template.json
 ```
+
+Open `brainstorm.prompt.md` inside your AI assistant. The agent **dialogs**
+with you — one focused question at a time, no invention, surfacing tradeoffs
+— until you confirm and it writes the final `project-brief.md` +
+`project-brief.json`. Then:
+
+```bash
+npx @opair/ai-sdlc create --from-brief project-brief.md
+```
+
+After `create` finishes, `cd <project-name>` — that is your framework root.
+Brainstorm + create are resumable (`ai-sdlc brainstorm --resume project-brief.json`).
 
 ### After init — pick a stack overlay
 

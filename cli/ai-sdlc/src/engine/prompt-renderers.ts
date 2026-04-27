@@ -44,6 +44,24 @@ const writeFile = (root: string, rel: string, content: string): string => {
   return rel;
 };
 
+/**
+ * Additive write: skip if the target file already exists. Used by
+ * vendor renderers so that prompts shipped verbatim via
+ * `templates/framework/.github/prompts/` (synced from the source repo)
+ * are not clobbered.
+ */
+const writeFileIfMissing = (
+  root: string,
+  rel: string,
+  content: string,
+): string | null => {
+  const abs = path.join(root, rel);
+  if (fs.existsSync(abs)) return null;
+  fs.mkdirSync(path.dirname(abs), { recursive: true });
+  fs.writeFileSync(abs, content, "utf8");
+  return rel;
+};
+
 interface PromptRenderer {
   vendor: Vendor;
   render(prompts: NeutralPrompt[], targetRoot: string): string[];
@@ -59,7 +77,12 @@ const copilot: PromptRenderer = {
         .dump({ description: p.description }, { lineWidth: 120 })
         .trimEnd();
       const out = `---\n${fm}\n---\n\n# ${p.title}\n\n${p.body.trimEnd()}\n`;
-      written.push(writeFile(root, `.github/prompts/${p.id}.prompt.md`, out));
+      const rel = writeFileIfMissing(
+        root,
+        `.github/prompts/${p.id}.prompt.md`,
+        out,
+      );
+      if (rel) written.push(rel);
     }
     return written;
   },

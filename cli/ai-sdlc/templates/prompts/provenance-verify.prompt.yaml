@@ -1,0 +1,23 @@
+id: provenance-verify
+title: provenance-verify
+description: Verify an attestation against a context-pack.
+category: sdlc
+body: |-
+  You are running the `ai-sdlc provenance-verify` capability.
+
+  Inputs:
+  ${input}
+
+  Rules:
+
+  - Follow `AGENTS.md` and `docs/agent-memory/00-anti-hallucination-charter.md`.
+  - Run the CLI command exactly; do not paraphrase its output.
+  - Cite any file paths or hashes you produce.
+
+  Steps:
+
+  1. Run `ai-sdlc provenance-verify --attestation <path>`.
+  2. Fail closed: do not proceed if signature or digest mismatches.
+  3. Log key id + result in the agent log.
+
+  When to invoke: consuming or releasing a signed pack.
