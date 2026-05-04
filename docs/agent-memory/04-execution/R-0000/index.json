@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "folder": "docs/agent-memory/04-execution/R-0000",
+  "description": "Agent memory folder.",
+  "files": [
+    {
+      "file": "docs/agent-memory/04-execution/R-0000/implementation-notes.md",
+      "kind": "md"
+    }
+  ],
+  "subfolders": []
+}

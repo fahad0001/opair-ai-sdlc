@@ -2,6 +2,7 @@
 
 | Requirement | Title | Status | Priority | Last Agent | Last Updated | Links |
 | ----------- | ----- | ------ | -------- | ---------- | ------------ | ----- |
+| R-0000 | Alpha 5 publish retry | Blocked | High | Execution | 2026-05-04 | [audit](09-audits/2026-05-04-alpha-5-release-prep.md), [execution](04-execution/R-0000/implementation-notes.md) |
 
 ## Status meanings
 

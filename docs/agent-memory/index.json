@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-05-04T05:31:39.082Z",
+  "generatedAt": "2026-05-04T08:36:50.110Z",
   "project": {
     "name": "agent-mem-framework",
     "repoRoot": ".",
@@ -80,6 +80,12 @@
         "kind": "phase",
         "indexFile": "docs/agent-memory/04-execution/index.json",
         "description": "Execution artifacts grouped by R-XXXX."
+      },
+      {
+        "folder": "docs/agent-memory/04-execution/R-0000",
+        "kind": "requirement",
+        "indexFile": "docs/agent-memory/04-execution/R-0000/index.json",
+        "description": "Agent memory folder."
       },
       {
         "folder": "docs/agent-memory/05-evaluation",

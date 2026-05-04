@@ -8,5 +8,11 @@
       "kind": "md"
     }
   ],
-  "subfolders": []
+  "subfolders": [
+    {
+      "folder": "docs/agent-memory/04-execution/R-0000",
+      "kind": "requirement",
+      "indexFile": "docs/agent-memory/04-execution/R-0000/index.json"
+    }
+  ]
 }
